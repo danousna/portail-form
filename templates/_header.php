@@ -11,6 +11,22 @@
     <title>SiMDE - Sondage</title>
 
     <style type="text/css">
+        body {
+            background: #E9EBEE;
+        }
+
+        .title {
+            color: #444;
+        }
+
+        .form-control {
+            border: 1px solid #DDDFE2;
+        }
+
+        input {
+            outline: 0 !important;
+        }
+
         .btn {
             padding: 6px 16px;
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -22,13 +38,26 @@
 
         .btn-like {
             padding: 2px 5px !important;
-            background: #ddd;
-            color: #333;
+            background: #F6F6F7;
+            color: #616770;
         }
 
         .idea {
-            background: rgba(0, 0, 0, 0.05);
-            border-radius: 2px;
+            background: white;
+            border-radius: 4px;
+            border: 1px solid #DDDFE2;
+        }
+
+        a.img {
+            opacity: .7;
+        }
+
+        a.img:hover {
+            opacity: 1;
+        }
+
+        a.img svg {
+            width: 100px;
         }
     </style>
 </head>
@@ -36,6 +65,7 @@
     <div class="container">
         <div class="row">
             <div class="col-sm-8 mx-auto">
-                <div class="text-center mt-5 p-2">
-                    <h2>Sondage sur le portail des assos</h2>
+                <div class="text-center mt-4 p-2">
+                    <a href="https://github.com/simde-utc"><img src="simde.svg" width="200"></a>
+                    <h2 class="my-4 font-weight-bold title">Sondage sur le portail des assos</h2>
                 </div>
