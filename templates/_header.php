@@ -15,10 +15,6 @@
             background: #E9EBEE;
         }
 
-        .title {
-            color: #444;
-        }
-
         .form-control {
             border: 1px solid #DDDFE2;
         }
@@ -66,6 +62,14 @@
         <div class="row">
             <div class="col-sm-8 mx-auto">
                 <div class="text-center mt-4 p-2">
-                    <a href="https://github.com/simde-utc"><img src="simde.svg" width="200"></a>
-                    <h2 class="my-4 font-weight-bold title">Sondage sur le portail des assos</h2>
+                    <a href="https://assos.utc.fr"><img src="simde.svg" width="200"></a>
+                    <h2 class="my-4">Sondage sur le portail des assos</h2>
+                </div>
+
+                <div class="my-3">
+                    <p class="text-justify">
+                        Le projet de refonte du portail des assos a été commencé. Nous nous adressons à tous les étudiants afin de recueillir des idées sur ce que ce nouveau portail pourrait être. 
+                    <p class="text-justify">
+                        Si vous avez toujours souhaité voir une fonctionnalité sur le portail, c'est le moment de le dire !
+                    </p>
                 </div>
