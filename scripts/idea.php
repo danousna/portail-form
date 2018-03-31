@@ -18,7 +18,7 @@ class Idea {
     // Post data
     public function post()
     {
-        if (isset($_POST['idea']) && is_string($_POST['idea']) && strlen($_POST['idea']) < 250)
+        if (isset($_POST['idea']) && strlen($_POST['idea']) > 5 && strlen($_POST['idea']) < 250)
         {
             $stmt = $this->conn->prepare('INSERT INTO ideas VALUES(NULL, :content)');
             if ($stmt->execute([$_POST['idea']]))

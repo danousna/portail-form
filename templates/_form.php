@@ -2,7 +2,7 @@
     <form method="POST" action="<?php echo $myUrl."?section=post"; ?>">
         <label for="idea">Soumettre une idée :</label>
         <div class="input-group">
-            <input type="text" class="form-control" id="idea" name="idea">
+            <input type="text" class="form-control" id="idea" name="idea" minlength="5" maxlength="250">
             <div class="input-group-append">
                 <button class="btn btn-primary" type="submit">Envoyer</button>
             </div>
