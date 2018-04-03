@@ -1,6 +1,7 @@
 CREATE TABLE `ideas` (
     `id` int(11) NOT NULL AUTO_INCREMENT,
     `content` varchar(255),
+    `user` varchar(255),
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 

@@ -18,16 +18,28 @@ class Idea {
     // Post data
     public function post()
     {
-        if (isset($_POST['idea']) && strlen($_POST['idea']) > 5 && strlen($_POST['idea']) < 250)
+        if (isset($_POST['idea']) && $_SESSION['user'] && strlen($_POST['idea']) > 5 && strlen($_POST['idea']) < 250)
         {
-            $stmt = $this->conn->prepare('INSERT INTO ideas VALUES(NULL, :content)');
-            if ($stmt->execute([$_POST['idea']]))
+            $stmt = $this->conn->prepare('INSERT INTO ideas VALUES(NULL, :content, :user)');
+            if ($stmt->execute([$_POST['idea'], $_SESSION['user']]))
                 header("Location: ./");
             else
                 echo "Une erreur est survenue";
         }
         else
             header("Location: ./");
+    }
+
+    // Get votes
+    public function user_ideas()
+    {
+        $stmt = $this->conn->prepare('SELECT COUNT(user) FROM ideas WHERE user = :user GROUP BY user');
+        $stmt->execute([$_SESSION['user']]);
+        $count = $stmt->fetchAll();
+
+        var_dump($count[0]);
+
+        return $count[0];
     }
 
     // Get votes

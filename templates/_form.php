@@ -7,5 +7,6 @@
                 <button class="btn btn-primary" type="submit">Envoyer</button>
             </div>
         </div>
+        <span class="text-muted">Il vous reste <?php echo 5 - $ideas->user_ideas();?> idée(s).</span>
     </form>
 </div>
