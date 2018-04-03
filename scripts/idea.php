@@ -20,11 +20,18 @@ class Idea {
     {
         if (isset($_POST['idea']) && $_SESSION['user'] && strlen($_POST['idea']) > 5 && strlen($_POST['idea']) < 250)
         {
-            $stmt = $this->conn->prepare('INSERT INTO ideas VALUES(NULL, :content, :user)');
-            if ($stmt->execute([$_POST['idea'], $_SESSION['user']]))
+            if ($this->user_ideas() >= 5)
+            {
                 header("Location: ./");
-            else
-                echo "Une erreur est survenue";
+            }
+            else 
+            {
+                $stmt = $this->conn->prepare('INSERT INTO ideas VALUES(NULL, :content, :user)');
+                if ($stmt->execute([$_POST['idea'], $_SESSION['user']]))
+                    header("Location: ./");
+                else
+                    echo "Une erreur est survenue";
+            }
         }
         else
             header("Location: ./");
@@ -37,9 +44,7 @@ class Idea {
         $stmt->execute([$_SESSION['user']]);
         $count = $stmt->fetchAll();
 
-        var_dump($count[0]);
-
-        return $count[0];
+        return $count[0]["COUNT(user)"];
     }
 
     // Get votes
