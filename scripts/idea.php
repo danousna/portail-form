@@ -2,11 +2,14 @@
 class Idea {
 
     private $conn;
+    private $dir_images = 'uploads/full_size';
+    private $dir_thumbs = 'uploads/thumb_size';
 
     // Get database access
     public function __construct(\PDO $pdo) 
     {
         $this->conn = $pdo;
+        $this->make_dirs();
     }
 
     // List all ideas
@@ -24,27 +27,52 @@ class Idea {
             {
                 header("Location: ./");
             }
-            else 
+            else
             {
                 $stmt = $this->conn->prepare('INSERT INTO ideas VALUES(NULL, :content, :user)');
-                if ($stmt->execute([$_POST['idea'], $_SESSION['user']]))
+                if ($stmt->execute([$_POST['idea'], $_SESSION['user']]))  {
+                    $idea = $this->conn->lastInsertId();
+                    $count = count($_FILES['file']['name']);
+
+                    if ($count > 0) {
+                        for ($i = 0; $i < $count; $i++)
+                        {
+                            $filename = $_SESSION['user'].'_'.time();
+                            $stmt = $this->conn->prepare('INSERT INTO images VALUES(:idea, :image)');
+
+                            if (move_uploaded_file($_FILES['file']['tmp_name'][$i], $this->dir_images.'/'.$filename)) {
+                                $stmt->execute([$idea, $filename]);
+                            }
+                        }
+                    }
+
                     header("Location: ./");
+                }
                 else
                     echo "Une erreur est survenue";
             }
         }
-        else
+        else {
             header("Location: ./");
+        }
     }
 
-    // Get votes
+    // Process image, validate, resize
+    public function process_image() {
+        // Code.
+    }
+
+    // Get user votes number
     public function user_ideas()
     {
         $stmt = $this->conn->prepare('SELECT COUNT(user) FROM ideas WHERE user = :user GROUP BY user');
         $stmt->execute([$_SESSION['user']]);
         $count = $stmt->fetchAll();
 
-        return $count[0]["COUNT(user)"];
+        if ($count)
+            return $count[0]["COUNT(user)"];
+        else
+            return 0;
     }
 
     // Get votes
@@ -91,4 +119,23 @@ class Idea {
         else
             header("Location: ./");
     }
+
+    // Make directories
+    protected function make_dirs()
+    {
+        if (!file_exists($this->dir_images)) {
+            mkdir($this->dir_images, 0755, true);
+        }
+
+        if (!file_exists($this->dir_thumbs)) {
+            mkdir($this->dir_thumbs, 0755, true);
+        }
+    }
+}
+
+// Dump and die
+function dd($data)
+{
+    print_r($data);
+    die;
 }

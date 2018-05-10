@@ -16,5 +16,42 @@
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+    <script>
+        /*
+            By Osvaldas Valutis, www.osvaldas.info
+            Available for use under the MIT License
+        */
+
+        'use strict';
+
+        ;( function ( document, window, index )
+        {
+            var inputs = document.querySelectorAll( '.inputfile' );
+            Array.prototype.forEach.call( inputs, function( input )
+            {
+                var label    = input.nextElementSibling,
+                    labelVal = label.innerHTML;
+
+                input.addEventListener( 'change', function( e )
+                {
+                    var fileName = '';
+                    if( this.files && this.files.length > 1 )
+                        fileName = ( this.getAttribute( 'data-multiple-caption' ) || '' ).replace( '{count}', this.files.length );
+                    else
+                        fileName = e.target.value.split( '\\' ).pop();
+
+                    if( fileName )
+                        label.querySelector( 'span' ).innerHTML = fileName;
+                    else
+                        label.innerHTML = labelVal;
+                });
+
+                // Firefox bug fix
+                input.addEventListener( 'focus', function(){ input.classList.add( 'has-focus' ); });
+                input.addEventListener( 'blur', function(){ input.classList.remove( 'has-focus' ); });
+            });
+        }( document, window, 0 ));
+    </script>
 </body>
 </html>
