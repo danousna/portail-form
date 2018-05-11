@@ -47,9 +47,10 @@
         }
 
         .btn-like {
-            padding: 2px 5px !important;
+            padding: 2px 7px !important;
             background: #F6F7F9;
             color: #4B4F56;
+            font-size: 16px;
         }
 
         .idea {
@@ -78,12 +79,18 @@
             position: absolute;
             z-index: -1;
         }
+
+        .loading {
+            opacity: 0.5;
+            pointer-events: none;
+            position: relative;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="row">
-            <div class="col-md-6 mx-auto">
+            <div class="col-md-7 mx-auto">
                 <div class="text-center mt-4 p-2">
                     <a href="https://assos.utc.fr"><img src="simde.svg" width="200"></a>
                     <h2 class="my-4">Sondage sur le portail des assos</h2>

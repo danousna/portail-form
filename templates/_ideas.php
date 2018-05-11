@@ -3,7 +3,9 @@
     <?php $images = $ideas->get_images($idea); ?>
 
     <div class="my-3 p-3 idea">
-        <h5 class="card-title font-weight-normal"><?php echo $idea["content"] ?></h5>
+        <h5 class="card-title font-weight-normal"><?php echo $idea["content"]; ?></h5>
+
+        <span id="<?php echo $idea['id']; ?>"></span>
 
         <div class="mb-3">
             <?php foreach($ideas->get_images($idea) as $image) { ?>
@@ -18,18 +20,18 @@
         <?php } else if (in_array($idea["id"], $ideas->votes())) { ?>
         
             <form class="d-inline-block" method="POST" action="<?php echo $myUrl."?section=vote"; ?>">
-                <input type="hidden" name="id" value="<?php echo $idea["id"] ?>">
+                <input type="hidden" name="id" value="<?php echo $idea["id"]; ?>">
                 <button type="submit" class="btn btn-like">
-                    <span class="text-primary"><?php echo $idea["nb_votes"] ?> votes</span>
+                    <span class="text-primary"><?php echo $idea["nb_votes"]; ?> votes</span>
                 </button>
             </form>
 
         <?php } else { ?>
 
             <form class="d-inline-block" method="POST" action="<?php echo $myUrl."?section=vote"; ?>">
-                <input type="hidden" name="id" value="<?php echo $idea["id"] ?>">
+                <input type="hidden" name="id" value="<?php echo $idea["id"]; ?>">
                 <button type="submit" class="btn btn-like">
-                    <span><?php echo $idea["nb_votes"] ?> votes</span>
+                    <span><?php echo $idea["nb_votes"]; ?> votes</span>
                 </button>
             </form>
 

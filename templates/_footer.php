@@ -53,5 +53,15 @@
             });
         }( document, window, 0 ));
     </script>
+
+    <script type="text/javascript">
+        $("#post-btn").on('click', function(event) {
+            $("#post-form").addClass("loading");
+
+            setTimeout(function() {
+                $("#post-form").removeClass("loading");
+            }, 5000);
+        });
+    </script>
 </body>
 </html>

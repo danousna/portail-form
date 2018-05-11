@@ -58,7 +58,7 @@ class Idea {
             {
                 if ($error == UPLOAD_ERR_OK)
                 {
-                    $filename = sha1_file($_FILES['file']['tmp_name'][$key]).'.jpg';
+                    $filename = time().'_'.sha1_file($_FILES['file']['tmp_name'][$key]).'.png';
 
                     // Here we test if the file has been moved AND if it is validated with the process_image() function.
                     $img = $this->process_image($key);
@@ -97,7 +97,6 @@ class Idea {
         }
     }
 
-    // TODO(Natan): Tester les filtres et le paramètre de blur.
     /**
      * Process image, validate, resize
      *
@@ -113,8 +112,8 @@ class Idea {
         $height = $imageprops['height'];
         $ratio = $width / $height;
 
-        $newWidth = 1000;
-        $newHeight = 1000 / $ratio;
+        $newWidth = 1500;
+        $newHeight = 1500 / $ratio;
 
         $imagick->resizeImage($newWidth,$newHeight, \Imagick::FILTER_LANCZOS, 0.9, true);
         return $imagick;
@@ -173,7 +172,7 @@ class Idea {
             {
                 $stmt = $this->conn->prepare('DELETE FROM votes WHERE idea = :idea AND user = :user');
                 if ($stmt->execute([$_POST['id'], $_SESSION['user']]))
-                    header("Location: ./");
+                    header("Location: ./#".$_POST['id']);
                 else
                     echo "Une erreur est survenue";
             }
@@ -181,7 +180,7 @@ class Idea {
             {
                 $stmt = $this->conn->prepare('INSERT INTO votes VALUES(:idea, :user)');
                 if ($stmt->execute([$_POST['id'], $_SESSION['user']]))
-                    header("Location: ./");
+                    header("Location: ./#".$_POST['id']);
                 else
                     echo "Une erreur est survenue";
             }
