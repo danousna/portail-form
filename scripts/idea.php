@@ -2,8 +2,8 @@
 class Idea {
 
     private $conn;
-    private $dir_images = 'uploads/full_size';
-    private $dir_thumbs = 'uploads/thumb_size';
+    public $dir_images = 'uploads/full_size';
+    public $dir_thumbs = 'uploads/thumb_size';
 
     /**
      * Get database access
@@ -23,7 +23,18 @@ class Idea {
      */
     public function all() 
     {
-        return $this->conn->query("SELECT id, content, COUNT(votes.idea) FROM ideas LEFT JOIN votes ON ideas.id = votes.idea GROUP BY id ORDER BY COUNT(votes.idea) DESC")->fetchAll();
+        return $this->conn->query("SELECT id, content, COUNT(votes.idea) AS nb_votes FROM ideas LEFT JOIN votes ON ideas.id = votes.idea GROUP BY id ORDER BY COUNT(votes.idea) DESC")->fetchAll();
+    }
+
+    /**
+     * Get idea's images
+     *
+     * @param array $idea
+     * @return PDOStatement
+     */
+    public function get_images($idea)
+    {
+        return $this->conn->query("SELECT image FROM images WHERE idea = ".$idea["id"])->fetchAll();
     }
 
     /**
