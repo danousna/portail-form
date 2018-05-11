@@ -38,7 +38,7 @@ class Idea {
                 $filename = $_SESSION['user'].'_'.time();
 
                 // Here we test if the file has been moved AND if it is validated with the process_image() function.
-                if (move_uploaded_file($_FILES['file']['tmp_name'][$i], $this->dir_images.'/'.$filename))
+                if (move_uploaded_file($_FILES['file']['tmp_name'][$i], $this->dir_images.'/'.$filename.'.png'))
                 {
                     $images[] = $filename;
                 } else
