@@ -5,26 +5,38 @@ class Idea {
     private $dir_images = 'uploads/full_size';
     private $dir_thumbs = 'uploads/thumb_size';
 
-    // Get database access
+    /**
+     * Get database access
+     *
+     * @param \PDO $pdo
+     */
     public function __construct(\PDO $pdo) 
     {
         $this->conn = $pdo;
         $this->make_dirs();
     }
 
-    // List all ideas
+    /** 
+     * List all ideas
+     *
+     * @return PDOStatement
+     */
     public function all() 
     {
         return $this->conn->query("SELECT id, content, COUNT(votes.idea) FROM ideas LEFT JOIN votes ON ideas.id = votes.idea GROUP BY id ORDER BY COUNT(votes.idea) DESC")->fetchAll();
     }
 
-    // Post data
+    /**
+     * Post data
+     *
+     * @return header("Location: ./") || error
+     */
     public function post()
     {
         if (!isset($_POST['idea']) || !$_SESSION['user'] || strlen($_POST['idea']) <= 5 || strlen($_POST['idea']) > 250)
             header("Location: ./");
 
-        if ($this->user_ideas() >= 5)
+        if ($this->user_ideas() > 5)
             header("Location: ./");
 
         $file_count = count($_FILES['file']['name']);
@@ -33,16 +45,19 @@ class Idea {
 
         if ($file_count > 0)
         {
-            for ($i = 0; $i < $file_count; $i++)
+            foreach ($_FILES["file"]["error"] as $key => $error) {
             {
-                $filename = $_SESSION['user'].'_'.time();
+                if ($error == UPLOAD_ERR_OK) {
+                    $filename = $_SESSION['user'].'_'.time();
 
-                // Here we test if the file has been moved AND if it is validated with the process_image() function.
-                if (move_uploaded_file($_FILES['file']['tmp_name'][$i], $this->dir_images.'/'.$filename.'.png'))
-                {
-                    $images[] = $filename;
-                } else
-                    $file_errors++;
+                    // Here we test if the file has been moved AND if it is validated with the process_image() function.
+                    if (move_uploaded_file($_FILES['file']['tmp_name'][$key], $this->dir_images.'/'.$filename.'.png'))
+                    {
+                        $images[] = $filename;
+                    } else
+                        $file_errors++;
+                    }
+                }
             }
 
             if ($file_errors >= $file_count)
@@ -69,12 +84,20 @@ class Idea {
         }
     }
 
-    // Process image, validate, resize
+    /**
+     * Process image, validate, resize
+     *
+     * @return ?
+     */
     public function process_image() {
         // Code.
     }
 
-    // Get user votes number
+    /** 
+     * Get user votes number
+     *
+     * @return int
+     */
     public function user_ideas()
     {
         $stmt = $this->conn->prepare('SELECT COUNT(user) FROM ideas WHERE user = :user GROUP BY user');
@@ -87,7 +110,11 @@ class Idea {
             return 0;
     }
 
-    // Get votes
+    /** 
+     * Get votes
+     *
+     * @return array
+     */
     public function votes()
     {
         $stmt = $this->conn->prepare('SELECT * FROM votes WHERE user = :user');
@@ -103,7 +130,11 @@ class Idea {
         return $data;
     }
 
-    // Vote idea
+    /**
+     * Vote idea
+     *
+     * @return header("Location: ./") || error
+     */
     public function vote()
     {
         if (isset($_POST['id']) && is_string($_POST['id']))
@@ -132,7 +163,10 @@ class Idea {
             header("Location: ./");
     }
 
-    // Make directories
+    /** 
+    * Make directories
+    *
+    */
     protected function make_dirs()
     {
         if (!file_exists($this->dir_images)) {
