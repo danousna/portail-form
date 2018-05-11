@@ -5,9 +5,11 @@
     <div class="my-3 p-3 idea">
         <h5 class="card-title font-weight-normal"><?php echo $idea["content"] ?></h5>
 
-        <?php foreach($ideas->get_images($idea) as $image) { ?>
-            <img class="img-fluid" src="<?php echo $myUrl.$ideas->dir_images.'/'.$image['image'].'.png'; ?>">
-        <?php } ?>
+        <div class="mb-3">
+            <?php foreach($ideas->get_images($idea) as $image) { ?>
+                <img class="img-fluid" src="<?php echo $myUrl.$ideas->dir_images.'/'.$image['image'].'.jpg'; ?>">
+            <?php } ?>
+        </div>
 
         <?php if (!isset($_SESSION['user'])) { ?>
         

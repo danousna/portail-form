@@ -2,8 +2,7 @@
 class Idea {
 
     private $conn;
-    public $dir_images = 'uploads/full_size';
-    public $dir_thumbs = 'uploads/thumb_size';
+    public $dir_images = 'uploads/';
 
     /**
      * Get database access
@@ -40,7 +39,7 @@ class Idea {
     /**
      * Post data
      *
-     * @return header("Location: ./") || error
+     * @return header("Location: ./") | error
      */
     public function post()
     {
@@ -62,8 +61,11 @@ class Idea {
                     $filename = sha1_file($_FILES['file']['tmp_name'][$key]);
 
                     // Here we test if the file has been moved AND if it is validated with the process_image() function.
-                    if (move_uploaded_file($_FILES['file']['tmp_name'][$key], $this->dir_images.'/'.$filename.'.png'))
-                        $images[] = $filename;
+                    if ($img = $this->process_image($_FILES['file']['tmp_name'][$key]))
+                    {
+                        if (move_uploaded_file($_FILES['file']['tmp_name'][$key], $this->dir_images.$filename.'.jpg'))
+                            $images[] = $filename;
+                    }
                 }
             }
 
@@ -93,10 +95,25 @@ class Idea {
     /**
      * Process image, validate, resize
      *
-     * @return ?
+     * @return resource
      */
-    public function process_image() {
-        // Code.
+    public function process_image($file)
+    {
+        if (list($width, $height) = getimagesize($file))
+        {
+
+            $r = $width / $height;
+            $w = 700;
+            $h = $w / $r;
+
+            $src = imagecreatefromjpeg($file);
+            $dst = imagecreatetruecolor($w, $h);
+            imagecopyresampled($dst, $src, 0, 0, 0, 0, $w, $h, $width, $height);
+
+            return $dst;
+        }
+        else
+            return NULL;
     }
 
     /** 
@@ -139,7 +156,7 @@ class Idea {
     /**
      * Vote idea
      *
-     * @return header("Location: ./") || error
+     * @return header("Location: ./") | error
      */
     public function vote()
     {
@@ -177,10 +194,6 @@ class Idea {
     {
         if (!file_exists($this->dir_images)) {
             mkdir($this->dir_images, 0755, true);
-        }
-
-        if (!file_exists($this->dir_thumbs)) {
-            mkdir($this->dir_thumbs, 0755, true);
         }
     }
 }
