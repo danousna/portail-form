@@ -61,11 +61,16 @@ class Idea {
                     $filename = sha1_file($_FILES['file']['tmp_name'][$key]);
 
                     // Here we test if the file has been moved AND if it is validated with the process_image() function.
-                    if ($img = $this->process_image($_FILES['file']['tmp_name'][$key]))
+                    $img = $this->process_image($key);
+                    if ($img)
                     {
-                        if (move_uploaded_file($_FILES['file']['tmp_name'][$key], $this->dir_images.$filename.'.jpg'))
+                        if (move_uploaded_file($img, $this->dir_images.$filename.'.jpg'))
                             $images[] = $filename;
+                        else
+                            dd('ERREUR move_uploaded_file()');
                     }
+                    else
+                        dd('ERREUR process_image()');
                 }
             }
 
@@ -95,16 +100,19 @@ class Idea {
     /**
      * Process image, validate, resize
      *
+     * @param 
      * @return resource
      */
-    public function process_image($file)
+    public function process_image($key)
     {
-        if (list($width, $height) = getimagesize($file))
+        if (list($width, $height) = getimagesize($_FILES['file']['tmp_name'][$key]))
         {
 
             $r = $width / $height;
             $w = 700;
             $h = $w / $r;
+
+            $file = convertImage($_FILES['file']['name'][$key]);
 
             $src = imagecreatefromjpeg($file);
             $dst = imagecreatetruecolor($w, $h);
@@ -203,4 +211,24 @@ function dd($data)
 {
     print_r($data);
     die;
+}
+
+function convertImage($image)
+{
+    // jpg, png, gif or bmp?
+    $exploded = explode('.',$image);
+    $ext = $exploded[count($exploded) - 1]; 
+
+    if (preg_match('/jpg|jpeg/i',$ext))
+        $imageTmp=imagecreatefromjpeg($image);
+    else if (preg_match('/png/i',$ext))
+        $imageTmp=imagecreatefrompng($image);
+    else if (preg_match('/gif/i',$ext))
+        $imageTmp=imagecreatefromgif($image);
+    else if (preg_match('/bmp/i',$ext))
+        $imageTmp=imagecreatefrombmp($image);
+    else
+        return NULL;
+
+    return $imageTmp;
 }
