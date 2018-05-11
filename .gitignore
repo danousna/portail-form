@@ -1,3 +1,2 @@
 scripts/db.php
-uploads/full_size/*
-uploads/thumb_size/*
+uploads/*

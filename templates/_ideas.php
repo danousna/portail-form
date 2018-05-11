@@ -7,7 +7,7 @@
 
         <div class="mb-3">
             <?php foreach($ideas->get_images($idea) as $image) { ?>
-                <img class="img-fluid" src="<?php echo $myUrl.$ideas->dir_images.'/'.$image['image'].'.jpg'; ?>">
+                <img class="img-fluid" src="<?php echo $myUrl.$ideas->dir_images.$image['image']; ?>">
             <?php } ?>
         </div>
 

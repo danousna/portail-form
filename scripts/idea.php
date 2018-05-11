@@ -58,16 +58,16 @@ class Idea {
             {
                 if ($error == UPLOAD_ERR_OK)
                 {
-                    $filename = sha1_file($_FILES['file']['tmp_name'][$key]);
+                    $filename = sha1_file($_FILES['file']['tmp_name'][$key]).'.jpg';
 
                     // Here we test if the file has been moved AND if it is validated with the process_image() function.
                     $img = $this->process_image($key);
                     if ($img)
                     {
-                        if (move_uploaded_file($img, $this->dir_images.$filename.'.jpg'))
+                        if ($img->writeImage($this->dir_images.$filename))
                             $images[] = $filename;
                         else
-                            dd('ERREUR move_uploaded_file()');
+                            dd('ERREUR sauvegarde image');
                     }
                     else
                         dd('ERREUR process_image()');
@@ -97,31 +97,27 @@ class Idea {
         }
     }
 
+    // TODO(Natan): Tester les filtres et le paramètre de blur.
     /**
      * Process image, validate, resize
      *
-     * @param 
-     * @return resource
+     * @param int $key
+     * @return \Imagick
      */
     public function process_image($key)
     {
-        if (list($width, $height) = getimagesize($_FILES['file']['tmp_name'][$key]))
-        {
+        $imagick = new \Imagick($_FILES['file']['tmp_name'][$key]);
 
-            $r = $width / $height;
-            $w = 700;
-            $h = $w / $r;
+        $imageprops = $imagick->getImageGeometry();
+        $width = $imageprops['width'];
+        $height = $imageprops['height'];
+        $ratio = $width / $height;
 
-            $file = convertImage($_FILES['file']['name'][$key]);
+        $newWidth = 1000;
+        $newHeight = 1000 / $ratio;
 
-            $src = imagecreatefromjpeg($file);
-            $dst = imagecreatetruecolor($w, $h);
-            imagecopyresampled($dst, $src, 0, 0, 0, 0, $w, $h, $width, $height);
-
-            return $dst;
-        }
-        else
-            return NULL;
+        $imagick->resizeImage($newWidth,$newHeight, \Imagick::FILTER_LANCZOS, 0.9, true);
+        return $imagick;
     }
 
     /** 
