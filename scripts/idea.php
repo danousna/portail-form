@@ -41,27 +41,20 @@ class Idea {
 
         $file_count = count($_FILES['file']['name']);
         $images = array();
-        $file_errors = 0;
 
         if ($file_count > 0)
         {
-            foreach ($_FILES["file"]["error"] as $key => $error) {
+            foreach ($_FILES["file"]["error"] as $key => $error)
             {
-                if ($error == UPLOAD_ERR_OK) {
-                    $filename = $_SESSION['user'].'_'.time();
+                if ($error == UPLOAD_ERR_OK)
+                {
+                    $filename = sha1_file($_FILES['file']['tmp_name'][$key]);
 
                     // Here we test if the file has been moved AND if it is validated with the process_image() function.
                     if (move_uploaded_file($_FILES['file']['tmp_name'][$key], $this->dir_images.'/'.$filename.'.png'))
-                    {
                         $images[] = $filename;
-                    } else
-                        $file_errors++;
-                    }
                 }
             }
-
-            if ($file_errors >= $file_count)
-                header("Location: ./");
 
             $stmt = $this->conn->prepare('INSERT INTO ideas VALUES(NULL, :content, :user)');
             if ($stmt->execute([$_POST['idea'], $_SESSION['user']]))
@@ -70,9 +63,11 @@ class Idea {
 
                 foreach ($images as $image)
                 {
-                    $stmt = $this->conn->prepare('INSERT INTO images VALUES(:idea, :image)');
-                    $stmt->execute([$idea, $image]);
+                    $stmt = $this->conn->prepare('INSERT INTO images VALUES(:image, :idea)');
+                    $stmt->execute([$image, $idea]);
                 }
+
+                header("Location: ./");
             }
 
         }

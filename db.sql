@@ -12,8 +12,8 @@ CREATE TABLE `votes` (
 
 
 CREATE TABLE `images` (
-    `idea` int(11) NOT NULL,
-    `image` varchar(255) NOT NULL
+    `image` varchar(255) NOT NULL,
+    `idea` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 ALTER TABLE `votes`
@@ -23,7 +23,7 @@ ALTER TABLE `votes`
 ADD CONSTRAINT `votes_fk_idea` FOREIGN KEY (`idea`) REFERENCES `ideas` (`id`);
 
 ALTER TABLE `images`
-ADD PRIMARY KEY (`idea`,`image`);
+ADD PRIMARY KEY (`image`);
 
 ALTER TABLE `images`
 ADD CONSTRAINT `images_fk_idea` FOREIGN KEY (`idea`) REFERENCES `ideas` (`id`);
