@@ -21,39 +21,51 @@ class Idea {
     // Post data
     public function post()
     {
-        if (isset($_POST['idea']) && $_SESSION['user'] && strlen($_POST['idea']) > 5 && strlen($_POST['idea']) < 250)
-        {
-            if ($this->user_ideas() >= 5)
-            {
-                header("Location: ./");
-            }
-            else
-            {
-                $stmt = $this->conn->prepare('INSERT INTO ideas VALUES(NULL, :content, :user)');
-                if ($stmt->execute([$_POST['idea'], $_SESSION['user']]))  {
-                    $idea = $this->conn->lastInsertId();
-                    $count = count($_FILES['file']['name']);
-
-                    if ($count > 0) {
-                        for ($i = 0; $i < $count; $i++)
-                        {
-                            $filename = $_SESSION['user'].'_'.time();
-                            $stmt = $this->conn->prepare('INSERT INTO images VALUES(:idea, :image)');
-
-                            if (move_uploaded_file($_FILES['file']['tmp_name'][$i], $this->dir_images.'/'.$filename)) {
-                                $stmt->execute([$idea, $filename]);
-                            }
-                        }
-                    }
-
-                    header("Location: ./");
-                }
-                else
-                    echo "Une erreur est survenue";
-            }
-        }
-        else {
+        if (!isset($_POST['idea']) || !$_SESSION['user'] || strlen($_POST['idea']) <= 5 || strlen($_POST['idea']) > 250)
             header("Location: ./");
+
+        if ($this->user_ideas() >= 5)
+            header("Location: ./");
+
+        $file_count = count($_FILES['file']['name']);
+        $images = array();
+        $file_errors = 0;
+
+        if ($file_count > 0)
+        {
+            for ($i = 0; $i < $file_count; $i++)
+            {
+                $filename = $_SESSION['user'].'_'.time();
+
+                // Here we test if the file has been moved AND if it is validated with the process_image() function.
+                if (move_uploaded_file($_FILES['file']['tmp_name'][$i], $this->dir_images.'/'.$filename))
+                {
+                    $images[] = $filename;
+                } else
+                    $file_errors++;
+            }
+
+            if ($file_errors >= $file_count)
+                header("Location: ./");
+
+            $stmt = $this->conn->prepare('INSERT INTO ideas VALUES(NULL, :content, :user)');
+            if ($stmt->execute([$_POST['idea'], $_SESSION['user']]))
+            {
+                $idea = $this->conn->lastInsertId();
+
+                foreach ($images as $image)
+                {
+                    $stmt = $this->conn->prepare('INSERT INTO images VALUES(:idea, :image)');
+                    $stmt->execute([$idea, $image]);
+                }
+            }
+
+        }
+        else // No images
+        {
+            $stmt = $this->conn->prepare('INSERT INTO ideas VALUES(NULL, :content, :user)');
+            if ($stmt->execute([$_POST['idea'], $_SESSION['user']]))
+                header("Location: ./");
         }
     }
 
