@@ -7,7 +7,7 @@ require_once('scripts/db.php');
 require_once('scripts/idea.php');
 
 /* CAS */
-$myUrl = "http://".$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
+$myUrl = "http://".$_SERVER['HTTP_HOST'].strtok($_SERVER["REQUEST_URI"],'?');
 $casUrl = "https://cas.utc.fr/cas/";
 require_once('cas/xml.php');
 require_once('cas/cas.php');

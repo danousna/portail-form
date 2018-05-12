@@ -3,6 +3,7 @@ class Idea {
 
     private $conn;
     public $dir_images = 'uploads/';
+    public $dir_thumbs = 'uploads/t/';
 
     /**
      * Get database access
@@ -61,10 +62,12 @@ class Idea {
                     $filename = time().'_'.sha1_file($_FILES['file']['tmp_name'][$key]).'.png';
 
                     // Here we test if the file has been moved AND if it is validated with the process_image() function.
-                    $img = $this->process_image($key);
-                    if ($img)
+                    $img = $this->process_image($key, 2000);
+                    $thumb = $this->process_image($key, 200);
+
+                    if ($img && $thumb)
                     {
-                        if ($img->writeImage($this->dir_images.$filename))
+                        if ($img->writeImage($this->dir_images.$filename) && $thumb->writeImage($this->dir_thumbs.$filename))
                             $images[] = $filename;
                         else
                             dd('ERREUR sauvegarde image');
@@ -103,7 +106,7 @@ class Idea {
      * @param int $key
      * @return \Imagick
      */
-    public function process_image($key)
+    public function process_image($key, $size)
     {
         $imagick = new \Imagick($_FILES['file']['tmp_name'][$key]);
 
@@ -112,10 +115,12 @@ class Idea {
         $height = $imageprops['height'];
         $ratio = $width / $height;
 
-        $newWidth = 1500;
-        $newHeight = 1500 / $ratio;
+        $newWidth = $size;
+        $newHeight = $size / $ratio;
 
-        $imagick->resizeImage($newWidth,$newHeight, \Imagick::FILTER_LANCZOS, 0.9, true);
+        if ($width > $size || $height > $size)
+            $imagick->resizeImage($newWidth,$newHeight, \Imagick::FILTER_LANCZOS, 0.9, true);
+
         return $imagick;
     }
 
@@ -197,6 +202,10 @@ class Idea {
     {
         if (!file_exists($this->dir_images)) {
             mkdir($this->dir_images, 0755, true);
+        }
+
+        if (!file_exists($this->dir_thumbs)) {
+            mkdir($this->dir_thumbs, 0755, true);
         }
     }
 }

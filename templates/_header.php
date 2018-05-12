@@ -80,10 +80,41 @@
             z-index: -1;
         }
 
+        .bg-block {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 8;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+
         .loading {
             opacity: 0.5;
             pointer-events: none;
             position: relative;
+        }
+
+        .lightbox {
+            position: fixed;
+            width: 75%;
+            height: 75%;
+            z-index: 10;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .lightbox img {
+            display: block;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            height: auto;
         }
     </style>
 </head>
