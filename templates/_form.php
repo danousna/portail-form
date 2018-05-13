@@ -1,3 +1,23 @@
+<?php if (isset($_SESSION['error'])) { ?>
+
+    <div class="idea">
+        <?php echo $_SESSION['error']; ?>
+    </div>
+
+    <?php unset($_SESSION['error']); ?>
+
+<?php } ?>
+
+<?php if (isset($_SESSION['success'])) { ?>
+
+    <div class="idea">
+        <?php echo $_SESSION['success']; ?>
+    </div>
+
+    <?php unset($_SESSION['success']); ?>
+
+<?php } ?>
+
 <?php $user_ideas = $ideas->user_ideas(); ?>
 <?php if ($user_ideas >= 5) { ?>
     Nombre maximum d'idées atteint.
