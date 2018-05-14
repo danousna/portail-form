@@ -45,10 +45,16 @@ class Idea {
     public function post()
     {
         if (!isset($_POST['idea']) || !$_SESSION['user'] || strlen($_POST['idea']) <= 5 || strlen($_POST['idea']) > 250)
+        {
+            message('error', 'Erreur interne.');
             header("Location: ./");
+        }
 
         if ($this->user_ideas() > 5)
+        {
+            message('error', 'Nombre maximum d\'idées atteint.');
             header("Location: ./");
+        }
 
         $file_count = count($_FILES['file']['name']);
         $images = array();
@@ -62,28 +68,22 @@ class Idea {
                     // TODO :: NO PNG HARDCODED !!!
                     $filename = time().'_'.sha1_file($_FILES['file']['tmp_name'][$key]).'.png';
 
-                    try 
-                    {    
-                        $img = $this->process_image($key, 2000);
-                        $thumb = $this->process_image($key, 200);
-                    }
-                    catch (ImagickException $e)
-                    {
-                        $_SESSION['error'] = "Un ou des fichiers ne sont pas des images valides.";
-                        header("Location: ./");
-                    }
-
-                    if ($img && $thumb)
+                    if (($img = $this->process_image($key, 2000)) && ($thumb = $this->process_image($key, 200)))
                     {
                         if ($img->writeImage($this->dir_images.$filename) && $thumb->writeImage($this->dir_thumbs.$filename))
+                        {
                             $images[] = $filename;
+                        }
                         else
-                            $_SESSION['error'] = "Erreur interne, veuillez réessayer.";
-                            header("Location: ./");
+                        {
+                            message('error', 'Erreur interne, veuillez réessayer.');
+                            return header("Location: ./");
+                        }
                     }
-                    else {
-                        $_SESSION['error'] = "Erreur interne, veuillez réessayer.";
-                        header("Location: ./");
+                    else
+                    {
+                        message('error', 'Un ou des fichiers ne sont pas des images valides.');
+                        return header("Location: ./");
                     }
                 }
             }
@@ -99,17 +99,18 @@ class Idea {
                     $stmt->execute([$image, $idea]);
                 }
 
-                $_SESSION['success'] = "Succès !";
-                header("Location: ./");
+                message('success', 'Idée publiée !');
+                return header("Location: ./");
             }
 
         }
         else // No images
         {
             $stmt = $this->conn->prepare('INSERT INTO ideas VALUES(NULL, :content, :user)');
-            if ($stmt->execute([$_POST['idea'], $_SESSION['user']])) {
-                $_SESSION['success'] = "Succès !";
-                header("Location: ./");
+            if ($stmt->execute([$_POST['idea'], $_SESSION['user']]))
+            {
+                message('success', 'Idée publiée !');
+                return header("Location: ./");
             }
         }
     }
@@ -126,8 +127,10 @@ class Idea {
         $imagick = new \Imagick($_FILES['file']['tmp_name'][$key]);
         $format = strtolower($imagick->getImageFormat());
 
-        if ($format != 'jpg' || $format != 'jpeg' || $format != 'png')
+        if (($format != 'jpg') || ($format != 'jpeg') || ($format != 'png'))
+        {
             return NULL;
+        }
 
         $imageprops = $imagick->getImageGeometry();
         $width = $imageprops['width'];
@@ -138,7 +141,9 @@ class Idea {
         $newHeight = $size / $ratio;
 
         if ($width > $size || $height > $size)
+        {
             $imagick->resizeImage($newWidth,$newHeight, \Imagick::FILTER_LANCZOS, 0.9, true);
+        }
 
         return $imagick;
     }
@@ -155,9 +160,13 @@ class Idea {
         $count = $stmt->fetchAll();
 
         if ($count)
+        {
             return $count[0]["COUNT(user)"];
+        }
         else
+        {
             return 0;
+        }
     }
 
     /** 
@@ -173,7 +182,8 @@ class Idea {
 
         $data = array();
 
-        foreach ($votes as $vote) {
+        foreach ($votes as $vote)
+        {
             $data[] = $vote['idea'];
         }
 
@@ -196,25 +206,31 @@ class Idea {
             {
                 $stmt = $this->conn->prepare('DELETE FROM votes WHERE idea = :idea AND user = :user');
                 if ($stmt->execute([$_POST['id'], $_SESSION['user']]))
-                    header("Location: ./#".$_POST['id']);
-                else {
-                    $_SESSION['error'] = "Erreur interne, veuillez réessayer.";
-                    header("Location: ./");
+                {
+                    return header("Location: ./#".$_POST['id']);
+                }
+                else
+                {
+                    message('error', 'Erreur interne, veuillez réessayer.');
+                    return header("Location: ./");
                 }
             }
             else
             {
                 $stmt = $this->conn->prepare('INSERT INTO votes VALUES(:idea, :user)');
                 if ($stmt->execute([$_POST['id'], $_SESSION['user']]))
-                    header("Location: ./#".$_POST['id']);
-                else {
-                    $_SESSION['error'] = "Erreur interne, veuillez réessayer.";
-                    header("Location: ./");
+                {
+                    return header("Location: ./#".$_POST['id']);
+                }
+                else 
+                {
+                    message('error', 'Erreur interne, veuillez réessayer.');
+                    return header("Location: ./");
                 }
             }
         }
         else
-            header("Location: ./");
+            return header("Location: ./");
     }
 
     /** 
@@ -223,11 +239,13 @@ class Idea {
     */
     protected function make_dirs()
     {
-        if (!file_exists($this->dir_images)) {
+        if (!file_exists($this->dir_images))
+        {
             mkdir($this->dir_images, 0755, true);
         }
 
-        if (!file_exists($this->dir_thumbs)) {
+        if (!file_exists($this->dir_thumbs))
+        {
             mkdir($this->dir_thumbs, 0755, true);
         }
     }
@@ -258,4 +276,25 @@ function convertImage($image)
         return NULL;
 
     return $imageTmp;
+}
+
+function message($type, $content)
+{
+    if (isset($_SESSION['success']))
+    {
+        unset($_SESSION['success']);
+    }
+    
+    if (isset($_SESSION['error']))
+    {
+        unset($_SESSION['error']);
+    }
+
+    if ($type == 'error') {
+        $_SESSION['error'] = $content;
+    }
+    else if ($type == 'success')
+    {
+        $_SESSION['success'] = $content;
+    }
 }

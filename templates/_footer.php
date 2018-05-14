@@ -69,7 +69,7 @@
 
                 setTimeout(function() {
                     $("#post-form").removeClass("loading");
-                }, 5000);
+                }, 200);
             });
 
             $("[data-fancybox]").fancybox({

@@ -1,20 +1,16 @@
 <?php if (isset($_SESSION['error'])) { ?>
 
-    <div class="idea">
-        <?php echo $_SESSION['error']; ?>
+    <div class="alert alert-danger">
+        <strong>Erreur : </strong> <?php echo $_SESSION['error']; ?>
     </div>
-
-    <?php unset($_SESSION['error']); ?>
 
 <?php } ?>
 
 <?php if (isset($_SESSION['success'])) { ?>
 
-    <div class="idea">
-        <?php echo $_SESSION['success']; ?>
+    <div class="alert alert-success">
+        <strong>Succès : </strong> <?php echo $_SESSION['success']; ?>
     </div>
-
-    <?php unset($_SESSION['success']); ?>
 
 <?php } ?>
 
