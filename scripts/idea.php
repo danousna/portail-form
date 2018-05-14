@@ -44,20 +44,33 @@ class Idea {
      */
     public function post()
     {
-        if (!isset($_POST['idea']) || !$_SESSION['user'] || strlen($_POST['idea']) <= 5 || strlen($_POST['idea']) > 250)
+        if (!isset($_POST['idea']) || !$_SESSION['user'])
         {
-            message('error', 'Erreur interne.');
-            header("Location: ./");
+            message('error', 'Problème lors de l\'envoi du formulaire ou taille maximale des fichiers dépassée.');
+            return header("Location: ./");
+        }
+
+        if (strlen($_POST['idea']) < 6)
+        {
+            message('error', 'Idée trop courte.');
+            return header("Location: ./");
+        }
+
+        if (strlen($_POST['idea']) > 250)
+        {
+            message('error', 'Idée trop longue.');
+            return header("Location: ./");
         }
 
         if ($this->user_ideas() > 5)
         {
             message('error', 'Nombre maximum d\'idées atteint.');
-            header("Location: ./");
+            return header("Location: ./");
         }
 
         $file_count = count($_FILES['file']['name']);
         $images = array();
+        $fileError = false;
 
         if ($file_count > 0)
         {
@@ -66,38 +79,46 @@ class Idea {
                 if ($error == UPLOAD_ERR_OK)
                 {
                     $extension = pathinfo($_FILES['file']['name'][$key], PATHINFO_EXTENSION);
-                    $filename = time().'_'.sha1_file($_FILES['file']['tmp_name'][$key]).$extension;
+                    $filename = time().'_'.sha1_file($_FILES['file']['tmp_name'][$key]).'.'.$extension;
                                    
                     try
                     {
                         $img = $this->process_image($key, 2000);
                         $thumb = $this->process_image($key, 200);
-                    }
-                    catch (ImagickException $e)
-                    {
-                        message('error', 'Un ou des fichiers ne sont pas des images valides.');
-                        return header("Location: ./");
-                    }
 
-                    if ($img && $thumb)
-                    {
-                        if ($img->writeImage($this->dir_images.$filename) && $thumb->writeImage($this->dir_thumbs.$filename))
-                        {
-                            $images[] = $filename;
+                        if ($img && $thumb) {
+                            if ($img->writeImage($this->dir_images.$filename) && $thumb->writeImage($this->dir_thumbs.$filename))
+                            {
+                                $images[] = $filename;
+                            }
+                            else
+                            {
+                                $fileError = true;
+                            }
                         }
                         else
                         {
-                            message('error', 'Erreur interne, veuillez réessayer.');
-                            return header("Location: ./");
+                            $fileError = true;
                         }
                     }
-                    else
+                    catch (ImagickException $e)
                     {
-                        message('error', 'Un ou des fichiers ne sont pas des images valides.');
-                        return header("Location: ./");
+                        $fileError = true;
                     }
                 }
             }
+
+            if ($fileError == true)
+            {
+                foreach ($images as $image)
+                {
+                    unlink($this->dir_images.$image);
+                    unlink($this->dir_thumbs.$image);
+                }
+
+                message('error', 'Un ou des fichiers ne sont pas des images valides (jpg, jpeg, png).');
+                return header("Location: ./");
+            } 
 
             $stmt = $this->conn->prepare('INSERT INTO ideas VALUES(NULL, :content, :user)');
             if ($stmt->execute([$_POST['idea'], $_SESSION['user']]))
@@ -279,26 +300,6 @@ function dd($data)
 {
     print_r($data);
     die;
-}
-
-function convertImage($image)
-{
-    // jpg, png, gif or bmp?
-    $exploded = explode('.',$image);
-    $ext = $exploded[count($exploded) - 1]; 
-
-    if (preg_match('/jpg|jpeg/i',$ext))
-        $imageTmp=imagecreatefromjpeg($image);
-    else if (preg_match('/png/i',$ext))
-        $imageTmp=imagecreatefrompng($image);
-    else if (preg_match('/gif/i',$ext))
-        $imageTmp=imagecreatefromgif($image);
-    else if (preg_match('/bmp/i',$ext))
-        $imageTmp=imagecreatefrombmp($image);
-    else
-        return NULL;
-
-    return $imageTmp;
 }
 
 function message($type = NULL, $content = NULL)

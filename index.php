@@ -1,18 +1,15 @@
 <?php
 
-// error_reporting(0);
-// ini_set('display_errors', 0);
+session_start();
 
 require_once('scripts/db.php');
 require_once('scripts/idea.php');
 
-/* CAS */
+/* cas */
 $myUrl = "http://".$_SERVER['HTTP_HOST'].strtok($_SERVER["REQUEST_URI"],'?');
 $casUrl = "https://cas.utc.fr/cas/";
 require_once('cas/xml.php');
 require_once('cas/cas.php');
-
-session_start();
 
 $ideas = new Idea($pdo);
 

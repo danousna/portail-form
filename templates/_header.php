@@ -63,15 +63,18 @@
         }
 
         a.img {
-            opacity: .7;
+            opacity: .4;
+            color: black; 
         }
 
         a.img:hover {
-            opacity: 1;
+            opacity: .6;
+            text-decoration: none;
+            color: black;
         }
 
-        a.img svg {
-            width: 100px;
+        a.img svg { 
+            height: 14px;
         }
 
         .inputfile {

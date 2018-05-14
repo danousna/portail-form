@@ -1,15 +1,21 @@
-<?php if (isset($_SESSION['error'])) { ?>
+<?php if (!empty($_SESSION['error'])) { ?>
 
-    <div class="alert alert-danger">
-        <strong>Erreur : </strong> <?php echo $_SESSION['error']; ?>
-    </div>
-
+        <div class="alert alert-danger alert-dismissible show">
+            <strong>Erreur : </strong> <?php echo $_SESSION['error']; ?> 
+            <button type="button" class="close" data-dismiss="alert" aria-label="Fermer">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    
 <?php } ?>
 
-<?php if (isset($_SESSION['success'])) { ?>
+<?php if (!empty($_SESSION['success'])) { ?>
 
-    <div class="alert alert-success">
+    <div class="alert alert-success alert-dismissible show">
         <strong>Succès : </strong> <?php echo $_SESSION['success']; ?>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
     </div>
 
 <?php } ?>

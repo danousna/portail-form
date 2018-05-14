@@ -24,11 +24,11 @@
 
         <?php if (!isset($_SESSION['user'])) { ?>
         
-            <span><?php echo $idea["nb_votes"] ?> votes</span>
+            <span class="text-primary"><?php echo $idea["nb_votes"] ?> votes</span>
 
         <?php } else if (in_array($idea["id"], $ideas->votes())) { ?>
         
-            <form class="d-inline-block" method="POST" action="<?php echo $myUrl."?section=vote"; ?>">
+            <form class="d-inline-block mb-0" method="POST" action="<?php echo $myUrl."?section=vote"; ?>">
                 <input type="hidden" name="id" value="<?php echo $idea["id"]; ?>">
                 <button type="submit" class="btn btn-like">
                     <span class="text-primary"><?php echo $idea["nb_votes"]; ?> votes</span>
@@ -37,7 +37,7 @@
 
         <?php } else { ?>
 
-            <form class="d-inline-block" method="POST" action="<?php echo $myUrl."?section=vote"; ?>">
+            <form class="d-inline-block mb-0" method="POST" action="<?php echo $myUrl."?section=vote"; ?>">
                 <input type="hidden" name="id" value="<?php echo $idea["id"]; ?>">
                 <button type="submit" class="btn btn-like">
                     <span><?php echo $idea["nb_votes"]; ?> votes</span>
