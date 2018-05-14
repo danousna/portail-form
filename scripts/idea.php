@@ -65,10 +65,21 @@ class Idea {
             {
                 if ($error == UPLOAD_ERR_OK)
                 {
-                    // TODO :: NO PNG HARDCODED !!!
-                    $filename = time().'_'.sha1_file($_FILES['file']['tmp_name'][$key]).'.png';
+                    $extension = pathinfo($_FILES['file']['name'][$key], PATHINFO_EXTENSION);
+                    $filename = time().'_'.sha1_file($_FILES['file']['tmp_name'][$key]).$extension;
+                                   
+                    try
+                    {
+                        $img = $this->process_image($key, 2000);
+                        $thumb = $this->process_image($key, 200);
+                    }
+                    catch (ImagickException $e)
+                    {
+                        message('error', 'Un ou des fichiers ne sont pas des images valides.');
+                        return header("Location: ./");
+                    }
 
-                    if (($img = $this->process_image($key, 2000)) && ($thumb = $this->process_image($key, 200)))
+                    if ($img && $thumb)
                     {
                         if ($img->writeImage($this->dir_images.$filename) && $thumb->writeImage($this->dir_thumbs.$filename))
                         {
@@ -125,9 +136,16 @@ class Idea {
     public function process_image($key, $size)
     {
         $imagick = new \Imagick($_FILES['file']['tmp_name'][$key]);
+
+        $valid_formats = array(
+            'jpg',
+            'jpeg',
+            'png',
+        );
+
         $format = strtolower($imagick->getImageFormat());
 
-        if (($format != 'jpg') || ($format != 'jpeg') || ($format != 'png'))
+        if (!in_array($format, $valid_formats))
         {
             return NULL;
         }
@@ -207,6 +225,7 @@ class Idea {
                 $stmt = $this->conn->prepare('DELETE FROM votes WHERE idea = :idea AND user = :user');
                 if ($stmt->execute([$_POST['id'], $_SESSION['user']]))
                 {
+                    message();
                     return header("Location: ./#".$_POST['id']);
                 }
                 else
@@ -220,6 +239,7 @@ class Idea {
                 $stmt = $this->conn->prepare('INSERT INTO votes VALUES(:idea, :user)');
                 if ($stmt->execute([$_POST['id'], $_SESSION['user']]))
                 {
+                    message();
                     return header("Location: ./#".$_POST['id']);
                 }
                 else 
@@ -230,13 +250,16 @@ class Idea {
             }
         }
         else
+        {
+            message('error', 'Erreur interne, veuillez réessayer.');
             return header("Location: ./");
+        }
     }
 
     /** 
-    * Make directories
-    *
-    */
+     * Make directories
+     *
+     */
     protected function make_dirs()
     {
         if (!file_exists($this->dir_images))
@@ -278,7 +301,7 @@ function convertImage($image)
     return $imageTmp;
 }
 
-function message($type, $content)
+function message($type = NULL, $content = NULL)
 {
     if (isset($_SESSION['success']))
     {
