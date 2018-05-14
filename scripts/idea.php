@@ -47,25 +47,25 @@ class Idea {
         if (!isset($_POST['idea']) || !$_SESSION['user'])
         {
             message('error', 'Problème lors de l\'envoi du formulaire ou taille maximale des fichiers dépassée.');
-            return header("Location: ./");
+            redirect('./');
         }
 
         if (strlen($_POST['idea']) < 6)
         {
             message('error', 'Idée trop courte.');
-            return header("Location: ./");
+            redirect('./');
         }
 
         if (strlen($_POST['idea']) > 250)
         {
             message('error', 'Idée trop longue.');
-            return header("Location: ./");
+            redirect('./');
         }
 
         if ($this->user_ideas() > 5)
         {
             message('error', 'Nombre maximum d\'idées atteint.');
-            return header("Location: ./");
+            redirect('./');
         }
 
         $file_count = count($_FILES['file']['name']);
@@ -117,7 +117,7 @@ class Idea {
                 }
 
                 message('error', 'Un ou des fichiers ne sont pas des images valides (jpg, jpeg, png).');
-                return header("Location: ./");
+                redirect('./');
             } 
 
             $stmt = $this->conn->prepare('INSERT INTO ideas VALUES(NULL, :content, :user)');
@@ -132,7 +132,7 @@ class Idea {
                 }
 
                 message('success', 'Idée publiée !');
-                return header("Location: ./");
+                redirect('./');
             }
 
         }
@@ -142,7 +142,7 @@ class Idea {
             if ($stmt->execute([$_POST['idea'], $_SESSION['user']]))
             {
                 message('success', 'Idée publiée !');
-                return header("Location: ./");
+                redirect('./');
             }
         }
     }
@@ -247,12 +247,12 @@ class Idea {
                 if ($stmt->execute([$_POST['id'], $_SESSION['user']]))
                 {
                     message();
-                    return header("Location: ./#".$_POST['id']);
+                    redirect('./#'.$_POST['id']);
                 }
                 else
                 {
                     message('error', 'Erreur interne, veuillez réessayer.');
-                    return header("Location: ./");
+                    redirect('./');
                 }
             }
             else
@@ -261,19 +261,19 @@ class Idea {
                 if ($stmt->execute([$_POST['id'], $_SESSION['user']]))
                 {
                     message();
-                    return header("Location: ./#".$_POST['id']);
+                    redirect('./#'.$_POST['id']);
                 }
                 else 
                 {
                     message('error', 'Erreur interne, veuillez réessayer.');
-                    return header("Location: ./");
+                    redirect('./');
                 }
             }
         }
         else
         {
             message('error', 'Erreur interne, veuillez réessayer.');
-            return header("Location: ./");
+            redirect('./');
         }
     }
 
@@ -300,6 +300,12 @@ function dd($data)
 {
     print_r($data);
     die;
+}
+
+function redirect($location)
+{
+    header("Location: " . $location);
+    exit(0);
 }
 
 function message($type = NULL, $content = NULL)

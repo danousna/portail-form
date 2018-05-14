@@ -1,15 +1,17 @@
-<?php if (!empty($_SESSION['error'])) { ?>
+<?php if (isset($_SESSION['error'])) { ?>
 
-        <div class="alert alert-danger alert-dismissible show">
-            <strong>Erreur : </strong> <?php echo $_SESSION['error']; ?> 
-            <button type="button" class="close" data-dismiss="alert" aria-label="Fermer">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
+    <div class="alert alert-danger alert-dismissible show">
+        <strong>Erreur : </strong> <?php echo $_SESSION['error']; ?> 
+        <button type="button" class="close" data-dismiss="alert" aria-label="Fermer">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+
+    <?php unset($_SESSION['error']); ?>
     
 <?php } ?>
 
-<?php if (!empty($_SESSION['success'])) { ?>
+<?php if (isset($_SESSION['success'])) { ?>
 
     <div class="alert alert-success alert-dismissible show">
         <strong>Succès : </strong> <?php echo $_SESSION['success']; ?>
@@ -17,6 +19,8 @@
             <span aria-hidden="true">&times;</span>
         </button>
     </div>
+
+    <?php unset($_SESSION['success']); ?>
 
 <?php } ?>
 
