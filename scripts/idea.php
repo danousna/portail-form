@@ -21,7 +21,7 @@ class Idea {
      *
      * @return PDOStatement
      */
-    public function all() 
+    public function all()
     {
         return $this->conn->query("SELECT id, content, COUNT(votes.idea) AS nb_votes FROM ideas LEFT JOIN votes ON ideas.id = votes.idea GROUP BY id ORDER BY COUNT(votes.idea) DESC")->fetchAll();
     }
@@ -277,6 +277,62 @@ class Idea {
         }
     }
 
+    /**
+     * Delete idea and all its images
+     * 
+     *
+     */
+    public function delete()
+    {
+        if (!isset($_POST['id']) || !is_string($_POST['id']))
+        {
+            message('error', 'Erreur interne, veuillez réessayer.');
+            redirect('./');
+        }
+
+        $stmt = $this->conn->prepare('SELECT * FROM ideas WHERE id = :id');
+        $stmt->execute([$_POST['id']]);
+
+        if ($idea = $stmt->fetchAll())
+        {
+            if (count($idea) != 1)
+            {
+                message('error', 'Erreur interne, veuillez réessayer.');
+                redirect('./');
+            }
+
+            // Delete all idea's votes
+            $stmt_votes = $this->conn->prepare('DELETE FROM votes WHERE idea = :idea');
+
+            // Get all idea's images
+            $stmt_images = $this->conn->prepare('SELECT * FROM images WHERE idea = :idea');
+            $stmt_images->execute([$_POST['id']]);
+            $images = $stmt_images->fetchAll();
+
+            foreach ($images as $image) {
+                unlink($this->dir_images.$image['image']);
+                unlink($this->dir_thumbs.$image['image']);
+            }
+
+            // Delete all idea's images
+            $stmt_images = $this->conn->prepare('DELETE FROM images WHERE idea = :idea');
+
+            // Delete idea
+            $stmt_idea = $this->conn->prepare('DELETE FROM ideas WHERE id = :id');
+
+            if ($stmt_votes->execute([$_POST['id']]) && $stmt_images->execute([$_POST['id']]) && $stmt_idea->execute([$_POST['id']]))
+            {
+                message('success', 'Idée supprimée.');
+                redirect('./');
+            }
+        }
+        else
+        {
+            message('error', 'Aucune idée trouvée avec cette id.');
+            redirect('./');
+        }
+    }
+
     /** 
      * Make directories
      *
@@ -292,39 +348,5 @@ class Idea {
         {
             mkdir($this->dir_thumbs, 0755, true);
         }
-    }
-}
-
-// Dump and die
-function dd($data)
-{
-    print_r($data);
-    die;
-}
-
-function redirect($location)
-{
-    header("Location: " . $location);
-    exit(0);
-}
-
-function message($type = NULL, $content = NULL)
-{
-    if (isset($_SESSION['success']))
-    {
-        unset($_SESSION['success']);
-    }
-    
-    if (isset($_SESSION['error']))
-    {
-        unset($_SESSION['error']);
-    }
-
-    if ($type == 'error') {
-        $_SESSION['error'] = $content;
-    }
-    else if ($type == 'success')
-    {
-        $_SESSION['success'] = $content;
     }
 }

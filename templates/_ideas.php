@@ -45,5 +45,16 @@
             </form>
 
         <?php } ?>
+
+        <?php if ($admin->isAdmin()) { ?>
+
+            <form class="d-inline-block ml-5 my-0" method="POST" action="<?php echo $myUrl."?section=delete"; ?>">
+                <input type="hidden" name="id" value="<?php echo $idea["id"]; ?>">
+                <button type="submit" class="btn btn-link text-danger p-0 my-0">Supprimer</button>
+            </form>
+
+        <?php } ?>
+
     </div>
+
 <?php } ?>

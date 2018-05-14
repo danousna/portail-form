@@ -2,8 +2,10 @@
 
 session_start();
 
+require_once('scripts/helpers.php');
 require_once('scripts/db.php');
 require_once('scripts/idea.php');
+require_once('scripts/admin.php');
 
 /* cas */
 $myUrl = "http://".$_SERVER['HTTP_HOST'].strtok($_SERVER["REQUEST_URI"],'?');
@@ -12,6 +14,7 @@ require_once('cas/xml.php');
 require_once('cas/cas.php');
 
 $ideas = new Idea($pdo);
+$admin = new Admin($pdo);
 
 if (!isset($_SESSION['user']))
 {
@@ -22,17 +25,20 @@ if (!isset($_SESSION['user']))
 }
 else
 {
-    if (isset($_GET['section']) AND $_GET['section'] == 'login')
+    if (isset($_GET['section']) && $_GET['section'] == 'login')
         header("Location: ./");
 
-    if (isset($_GET['section']) AND $_GET['section'] == 'logout')
+    if (isset($_GET['section']) && $_GET['section'] == 'logout')
         include_once('cas/logout.php');
 
-    if (isset($_GET['section']) AND $_GET['section'] == 'post')
+    if (isset($_GET['section']) && $_GET['section'] == 'post')
         $ideas->post();
 
-    if (isset($_GET['section']) AND $_GET['section'] == 'vote')
+    if (isset($_GET['section']) && $_GET['section'] == 'vote')
         $ideas->vote();
+
+    if (isset($_GET['section']) && $_GET['section'] == 'delete' && $admin->isAdmin())
+        $ideas->delete();
 
     else
         include_once('templates/user.php');
