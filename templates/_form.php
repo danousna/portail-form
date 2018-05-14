@@ -40,7 +40,7 @@
                 <input class="btn btn-primary" type="submit" value="Envoyer" id="post-btn">
             </div>
 
-            <span class="text-muted small">Il vous reste <?php echo 5 - $user_ideas; ?> idée(s) | Format acceptés : jpg, jpeg, png | Taille totale : 10M.</span>
+            <span class="text-muted small">Il vous reste <?php echo 5 - $user_ideas; ?> idée(s) | Formats acceptés : jpg, jpeg, png | Taille totale : 10M.</span>
         </form>
     </div>
 <?php } ?>
